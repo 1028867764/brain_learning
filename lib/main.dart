@@ -1,6 +1,7 @@
 import 'data/sections_data.dart';
 import 'package:flutter/material.dart';
 import 'book_shelf.dart';
+import 'random_course.dart';
 
 //B站粉红
 const Color kBilibiliPink = Color(0xFFFB7299);
@@ -41,7 +42,7 @@ class GridViewExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
@@ -79,9 +80,56 @@ class GridViewExample extends StatelessWidget {
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.7,
                 height: MediaQuery.of(context).size.height * 0.2,
-                color: Colors.yellow,
+                color: xianyuBlue.withOpacity(0.5),
                 alignment: Alignment.center,
-                child: Text('好棒哦', style: TextStyle(fontSize: 24)),
+                child: Text(
+                  '进入书架',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                PageRouteBuilder(
+                  pageBuilder:
+                      (context, animation, secondaryAnimation) =>
+                          RandomCourse(),
+                  transitionsBuilder: (
+                    context,
+                    animation,
+                    secondaryAnimation,
+                    child,
+                  ) {
+                    const begin = Offset(1.0, 0.0);
+                    const end = Offset.zero;
+                    const curve = Curves.ease;
+                    var tween = Tween(
+                      begin: begin,
+                      end: end,
+                    ).chain(CurveTween(curve: curve));
+                    var offsetAnimation = animation.drive(tween);
+                    return SlideTransition(
+                      position: offsetAnimation,
+                      child: child,
+                    );
+                  },
+                ),
+              );
+            },
+            child: Container(
+              alignment: Alignment.center,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.7,
+                height: MediaQuery.of(context).size.height * 0.2,
+                color: Colors.yellow.withOpacity(0.5),
+                alignment: Alignment.center,
+                child: Text(
+                  '随机学习',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
           ),

@@ -1,12 +1,11 @@
 import 'package:brain_learning/main.dart';
 import 'package:flutter/material.dart';
-import 'widget/text_highligh_widget.dart';
 import 'data/sections_data.dart';
 import 'widget/knowledge.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'widget/progress_bar_painter.dart';
-import '../widget/text_highligh_widget.dart';
+import 'widget/reminder.dart';
 
 class ToStudy extends StatefulWidget {
   final String selectedBook;
@@ -24,7 +23,7 @@ class _ToStudyState extends State<ToStudy> {
   int totalCount = 1;
   late Size screenSize;
   bool _isLoading = true;
-
+  bool _isReminding = false;
   @override
   void initState() {
     super.initState();
@@ -36,6 +35,12 @@ class _ToStudyState extends State<ToStudy> {
           _isLoading = false;
         });
       }
+    });
+  }
+
+  void _longPressCopy(bool newValue) {
+    setState(() {
+      _isReminding = newValue;
     });
   }
 
@@ -137,6 +142,7 @@ class _ToStudyState extends State<ToStudy> {
                       whichStage: 'toLearn',
                       onStarPressed: _handleStarPressed,
                       topGap: 66,
+                      longPressCopy: _longPressCopy,
                     ),
                   ), // 传递回调函数
                   Positioned(
@@ -211,6 +217,7 @@ class _ToStudyState extends State<ToStudy> {
                       ),
                     ),
                   ),
+                  Reminder(isShowed: _isReminding),
                 ],
               ),
     );

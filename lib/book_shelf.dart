@@ -1,9 +1,6 @@
-import 'dart:math';
 import 'package:brain_learning/main.dart';
 import 'package:flutter/material.dart';
-import 'data/sections_data.dart';
 import 'book_stage_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class BookShelf extends StatefulWidget {
   final List<String> items;

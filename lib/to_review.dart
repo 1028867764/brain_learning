@@ -1,12 +1,11 @@
 import 'package:brain_learning/main.dart';
 import 'package:flutter/material.dart';
-import 'widget/text_highligh_widget.dart';
 import 'data/sections_data.dart';
 import 'widget/knowledge.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import '../widget/text_highligh_widget.dart';
 import 'widget/progress_bar_painter.dart';
+import 'widget/reminder.dart';
 
 class ToReview extends StatefulWidget {
   final String selectedBook;
@@ -26,6 +25,7 @@ class _ToReviewState extends State<ToReview> {
   double finishedPercent = 0;
   late Size screenSize;
   bool _isLoading = true;
+  bool _isReminding = false;
 
   @override
   void initState() {
@@ -54,6 +54,12 @@ class _ToReviewState extends State<ToReview> {
           getSections
               .where((section) => section.bookName == widget.selectedBook)
               .toList();
+    });
+  }
+
+  void _longPressCopy(bool newValue) {
+    setState(() {
+      _isReminding = newValue;
     });
   }
 
@@ -192,6 +198,7 @@ class _ToReviewState extends State<ToReview> {
                       whichStage: 'toReview',
                       onStarPressed: _handleStarPressed,
                       topGap: 100,
+                      longPressCopy: _longPressCopy,
                     ),
                   ), // 传递回调函数
                   Positioned(
@@ -260,100 +267,101 @@ class _ToReviewState extends State<ToReview> {
                                 ],
                               ),
                               SizedBox(height: 5),
-                              GestureDetector(
-                                child: Container(
-                                  alignment: Alignment.center,
+                              if (alreadyLearnedCount > 0)
+                                GestureDetector(
                                   child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(25),
-                                      color: cyberpunkGreen.withOpacity(0.2),
-                                      border: Border.all(
-                                        color: coolapkGreen.withOpacity(
-                                          0.8,
-                                        ), // 设置边框颜色
-                                        width: 1, // 设置边框宽度
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(25),
+                                        color: cyberpunkGreen.withOpacity(0.2),
+                                        border: Border.all(
+                                          color: coolapkGreen.withOpacity(
+                                            0.8,
+                                          ), // 设置边框颜色
+                                          width: 1, // 设置边框宽度
+                                        ),
                                       ),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 5,
-                                    ),
-                                    child: Text(
-                                      '一键归零',
-                                      style: TextStyle(
-                                        color: coolapkGreen,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 5,
+                                      ),
+                                      child: Text(
+                                        '一键归零',
+                                        style: TextStyle(
+                                          color: coolapkGreen,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
                                       ),
                                     ),
                                   ),
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              0,
+                                            ), // 设置圆角半径
+                                          ),
+                                          backgroundColor: Colors.white,
+                                          title: Text(
+                                            '请注意！',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                          content: Text(
+                                            '你确定要归零吗？',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(
+                                                  context,
+                                                ).pop(); // 关闭弹窗
+                                              },
+                                              child: Text(
+                                                '再想想',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                _clearAll();
+                                                Navigator.of(
+                                                  context,
+                                                ).pop(); // 关闭弹窗
+                                                // 在这里执行确认操作
+                                              },
+                                              child: Text(
+                                                '确定',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.normal,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
                                 ),
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            0,
-                                          ), // 设置圆角半径
-                                        ),
-                                        backgroundColor: Colors.white,
-                                        title: Text(
-                                          '请注意！',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        content: Text(
-                                          '你确定要归零吗？',
-                                          style: TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(
-                                                context,
-                                              ).pop(); // 关闭弹窗
-                                            },
-                                            child: Text(
-                                              '再想想',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.blue,
-                                              ),
-                                            ),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              _clearAll();
-                                              Navigator.of(
-                                                context,
-                                              ).pop(); // 关闭弹窗
-                                              // 在这里执行确认操作
-                                            },
-                                            child: Text(
-                                              '确定',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.normal,
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
                               SizedBox(height: 5),
                             ],
                           ),
@@ -361,6 +369,7 @@ class _ToReviewState extends State<ToReview> {
                       ),
                     ),
                   ),
+                  Reminder(isShowed: _isReminding),
                 ],
               ),
     );
